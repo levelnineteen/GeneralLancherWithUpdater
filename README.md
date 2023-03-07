@@ -1,4 +1,4 @@
-# GeneralLancherWithUpdater
+# GeneralLauncherWithUpdater
 
 自作ゲームを作って配布するも、修正箇所が見つかり再配布したい。  
 でもユーザーにとっては面倒なことこの上ない。ので、楽をするための簡易ランチャーを作りました。  
