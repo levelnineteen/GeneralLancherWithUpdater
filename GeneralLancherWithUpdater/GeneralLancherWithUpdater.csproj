@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{1C86CF45-9E1C-461E-A1F5-A0EB0D8A4F94}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>GeneralLancherWithUpdater</RootNamespace>
-    <AssemblyName>GeneralLancherWithUpdater</AssemblyName>
+    <RootNamespace>GeneralLauncherWithUpdater</RootNamespace>
+    <AssemblyName>GeneralLauncherWithUpdater</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -82,6 +82,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

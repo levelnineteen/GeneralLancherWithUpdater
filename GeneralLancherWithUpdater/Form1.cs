@@ -106,8 +106,8 @@ namespace GeneralLancherWithUpdater
             // textBoxに入力されたパスを取得
             string exepath = Path.Combine(currentdir, label2.Text, label3.Text);
 
-            // ファイルが存在するかどうかを確認
-            if (File.Exists(exepath))
+            // 宛先指定がちゃんとされているか確認
+            if (label7.Text != "" && label9.Text != "")
             {
                 using (WebClient client = new WebClient())
                 {
@@ -122,7 +122,7 @@ namespace GeneralLancherWithUpdater
                     textBox1.Text = result;
 
                     //URLから落としてきたバージョンと、iniに書いてあるバージョンが一致すれば起動
-                    if (result == label5.Text)
+                    if (result == label5.Text && File.Exists(exepath))
                     {
                         textBox1.Text = "ゲーム起動中……";
                         // ファイルを実行する
@@ -176,11 +176,17 @@ namespace GeneralLancherWithUpdater
                             }
                         }
 
-                        textBox1.Text = "アップデート完了。ゲーム起動中……";
-                        // ファイルを実行する
-                        Process.Start(exepath);
-                        //このランチャーを終了する。
-                        Application.Exit();
+                        if (File.Exists(exepath))
+                        {
+                            textBox1.Text = "アップデート完了。ゲーム起動中……";
+                            // ファイルを実行する
+                            Process.Start(exepath);
+                            //このランチャーを終了する。
+                            Application.Exit();
+                        } else
+                        {
+                            textBox1.Text = exepath + "のファイルが見つかりません。";
+                        }
                     }
                 }
             }
