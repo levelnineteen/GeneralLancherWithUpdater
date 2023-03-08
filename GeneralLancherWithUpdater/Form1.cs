@@ -142,10 +142,19 @@ namespace GeneralLancherWithUpdater
 
                     //証明書を無視。本番ではこのコードは外す。
                     ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+                    string result = "";
 
                     //アクセスしてバージョンをチェック
-                    string result = client.DownloadString(chkurl);
-                    textBox1.Text = result;
+                    try
+                    {
+                        result = client.DownloadString(chkurl);
+                        textBox1.Text = result;
+                    } catch (Exception ex)
+                    {
+                        textBox1.Text = "バージョンチェックURLが無効です。";
+                        return;
+                    }
+                    
 
                     //URLから落としてきたバージョンと、iniに書いてあるバージョンが一致すれば起動
                     if (result == label5.Text && File.Exists(exepath))
@@ -159,8 +168,6 @@ namespace GeneralLancherWithUpdater
                         // ダウンロードするZipファイルのURL
                         string zipUrl = label9.Text;
 
-
-
                         // 解凍先のディレクトリ
                         string extractDir = currentdir;
 
@@ -169,7 +176,14 @@ namespace GeneralLancherWithUpdater
                             // Zipファイルをダウンロードして保存
                             using (WebClient client2 = new WebClient())
                             {
-                                client2.DownloadFile(zipUrl, Path.Combine(downloadDir, "temp.zip"));
+                                try
+                                {
+                                    client2.DownloadFile(zipUrl, Path.Combine(downloadDir, "temp.zip"));
+                                } catch (Exception ex)
+                                {
+                                    textBox1.Text = "ダウンロードURLが無効です。";
+                                    return;
+                                }
                             }
 
                             // Zipファイルを解凍して上書き。このZipファイルにはiniファイルも含める。
