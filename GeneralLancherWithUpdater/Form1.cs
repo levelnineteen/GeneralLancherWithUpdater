@@ -99,9 +99,35 @@ namespace GeneralLancherWithUpdater
             }
         }
 
+        private void GameStart(string downloadDir, string exepath)
+        {
+            textBox1.Text = "ゲーム起動中……";
+
+            if (File.Exists(Path.Combine(downloadDir, "temp.zip")))
+            {
+                try
+                {
+                    File.Delete(Path.Combine(downloadDir, "temp.zip"));
+                }
+                catch (Exception ex)
+                {
+                    // 例外が発生した場合、エラーメッセージを表示して処理を終了する
+                    textBox1.Text = "Error: " + ex.ToString();
+                    return;
+                }
+            }
+
+            // ファイルを実行する
+            Process.Start(exepath);
+            //このランチャーを終了する。
+            Application.Exit();
+        }
+
         private void button1_Click(object sender, EventArgs e)
         {
             string currentdir = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
+            // ダウンロード先のディレクトリ
+            string downloadDir = currentdir;
 
             // textBoxに入力されたパスを取得
             string exepath = Path.Combine(currentdir, label2.Text, label3.Text);
@@ -124,11 +150,7 @@ namespace GeneralLancherWithUpdater
                     //URLから落としてきたバージョンと、iniに書いてあるバージョンが一致すれば起動
                     if (result == label5.Text && File.Exists(exepath))
                     {
-                        textBox1.Text = "ゲーム起動中……";
-                        // ファイルを実行する
-                        Process.Start(exepath);
-                        //このランチャーを終了する。
-                        Application.Exit();
+                        GameStart(downloadDir, exepath);
                     }
                     else
                     {
@@ -137,8 +159,7 @@ namespace GeneralLancherWithUpdater
                         // ダウンロードするZipファイルのURL
                         string zipUrl = label9.Text;
 
-                        // ダウンロード先のディレクトリ
-                        string downloadDir = currentdir;
+
 
                         // 解凍先のディレクトリ
                         string extractDir = currentdir;
@@ -152,7 +173,10 @@ namespace GeneralLancherWithUpdater
                             }
 
                             // Zipファイルを解凍して上書き。このZipファイルにはiniファイルも含める。
-                            MyZipFileExtensions.ExtractToDirectory(ZipFile.OpenRead(Path.Combine(downloadDir, "temp.zip")), extractDir, true);
+                            using (var zipArchive = ZipFile.OpenRead(Path.Combine(downloadDir, "temp.zip")))
+                            {
+                                MyZipFileExtensions.ExtractToDirectory(zipArchive, extractDir, true);
+                            }
 
 
                         }
@@ -178,11 +202,7 @@ namespace GeneralLancherWithUpdater
 
                         if (File.Exists(exepath))
                         {
-                            textBox1.Text = "アップデート完了。ゲーム起動中……";
-                            // ファイルを実行する
-                            Process.Start(exepath);
-                            //このランチャーを終了する。
-                            Application.Exit();
+                            GameStart(downloadDir, exepath);
                         } else
                         {
                             textBox1.Text = exepath + "のファイルが見つかりません。";
