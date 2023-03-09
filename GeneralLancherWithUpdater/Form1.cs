@@ -141,7 +141,7 @@ namespace GeneralLancherWithUpdater
                     string chkurl = label7.Text;
 
                     //証明書を無視。本番ではこのコードは外す。
-                    ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+                    //ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
                     string result = "";
 
                     //アクセスしてバージョンをチェック
