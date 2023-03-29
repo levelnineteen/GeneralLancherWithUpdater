@@ -86,6 +86,9 @@ namespace GeneralLancherWithUpdater
                         case "DownloadURL":
                             label9.Text = parts[1];
                             break;
+                        case "NewsURL":
+                            LoadNews(parts[1]);
+                            break;
                         default:
                             break;
                     }
@@ -97,6 +100,27 @@ namespace GeneralLancherWithUpdater
                 textBox1.Text = "対象フォルダにiniファイルが見つかりません。";
                 return false;
             }
+        }
+
+        private void LoadNews(string url)
+        {
+            string result = "";
+            using (WebClient client = new WebClient())
+            {
+                //ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+                try
+                {
+                    result = client.DownloadString(url);
+                    richTextBox1.Text = result;
+                }
+                catch (Exception ex)
+                {
+                    richTextBox1.Text = "ニュースURLが無効です。";
+                    //richTextBox1.Text = ex.Message;
+                    return;
+                }
+            }
+            return;
         }
 
         private void GameStart(string downloadDir, string exepath)
