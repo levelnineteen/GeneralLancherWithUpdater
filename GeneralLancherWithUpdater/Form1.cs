@@ -107,6 +107,7 @@ namespace GeneralLancherWithUpdater
             string result = "";
             using (WebClient client = new WebClient())
             {
+                client.Encoding = System.Text.Encoding.UTF8;
                 //ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
                 try
                 {
