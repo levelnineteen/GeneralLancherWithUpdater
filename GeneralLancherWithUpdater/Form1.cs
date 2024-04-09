@@ -13,6 +13,7 @@ using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System.Net;
 using System.Threading;
+using System.Text.RegularExpressions;
 
 namespace GeneralLancherWithUpdater
 {
@@ -173,7 +174,9 @@ namespace GeneralLancherWithUpdater
                     try
                     {
                         result = client.DownloadString(chkurl);
-                        textBox1.Text = result;
+                        //改行以降は削除
+                        result = Regex.Replace(result, @"(\r\n|\r|\n).*", "");
+                        //textBox1.Text = result;
                     } catch (Exception ex)
                     {
                         textBox1.Text = "バージョンチェックURLが無効です。";
