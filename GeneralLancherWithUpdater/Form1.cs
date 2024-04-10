@@ -163,6 +163,9 @@ namespace GeneralLancherWithUpdater
             {
                 using (WebClient client = new WebClient())
                 {
+                    client.DownloadProgressChanged += WebClient_DownloadProgressChanged; // ダウンロード進捗イベントの追加
+                    client.DownloadFileCompleted += WebClient_DownloadFileCompleted; // ダウンロード完了イベントの追加
+
                     textBox1.Text = "バージョンチェック中……";
                     string chkurl = label7.Text;
 
@@ -177,12 +180,12 @@ namespace GeneralLancherWithUpdater
                         //改行以降は削除
                         result = Regex.Replace(result, @"(\r\n|\r|\n).*", "");
                         //textBox1.Text = result;
-                    } catch (Exception ex)
+                    }
+                    catch (Exception ex)
                     {
                         textBox1.Text = "バージョンチェックURLが無効です。";
                         return;
                     }
-                    
 
                     //URLから落としてきたバージョンと、iniに書いてあるバージョンが一致すれば起動
                     if (result == label5.Text && File.Exists(exepath))
@@ -202,52 +205,12 @@ namespace GeneralLancherWithUpdater
                         try
                         {
                             // Zipファイルをダウンロードして保存
-                            using (WebClient client2 = new WebClient())
-                            {
-                                try
-                                {
-                                    client2.DownloadFile(zipUrl, Path.Combine(downloadDir, "temp.zip"));
-                                } catch (Exception ex)
-                                {
-                                    textBox1.Text = "ダウンロードURLが無効です。";
-                                    return;
-                                }
-                            }
-
-                            // Zipファイルを解凍して上書き。このZipファイルにはiniファイルも含める。
-                            using (var zipArchive = ZipFile.OpenRead(Path.Combine(downloadDir, "temp.zip")))
-                            {
-                                MyZipFileExtensions.ExtractToDirectory(zipArchive, extractDir, true);
-                            }
-
-
+                            client.DownloadFileAsync(new Uri(zipUrl), Path.Combine(downloadDir, "temp.zip")); // 非同期ダウンロードを開始
                         }
                         catch (Exception ex)
                         {
-                            // 例外が発生した場合、エラーメッセージを表示して処理を終了する
-                            textBox1.Text = "Error: " + ex.ToString();
+                            textBox1.Text = "ダウンロードURLが無効です。";
                             return;
-                        }
-                        finally
-                        {
-                            //Zipファイルを削除
-                            try
-                            {
-                                File.Delete(Path.Combine(downloadDir, "temp.zip"));
-                            }
-                            catch (IOException)
-                            {
-                                textBox1.Text = "展開中……";
-                                Thread.Sleep(1000);
-                            }
-                        }
-
-                        if (File.Exists(exepath))
-                        {
-                            GameStart(downloadDir, exepath);
-                        } else
-                        {
-                            textBox1.Text = exepath + "のファイルが見つかりません。";
                         }
                     }
                 }
@@ -258,7 +221,69 @@ namespace GeneralLancherWithUpdater
                 textBox1.Text = exepath + "のファイルが見つかりません。";
             }
         }
-    }
+
+        private void WebClient_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
+        {
+            // ダウンロード進捗を表示
+            textBox1.Text = string.Format("ダウンロード中... {0}% 完了", e.ProgressPercentage);
+        }
+
+        private void WebClient_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
+        {
+            if (e.Error != null)
+            {
+                textBox1.Text = "ダウンロードに失敗しました：" + e.Error.Message;
+                return;
+            }
+
+            string currentdir = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
+            string downloadDir = currentdir;
+            string extractDir = currentdir;
+
+            try
+            {
+                // Zipファイルを解凍して上書き
+                using (var zipArchive = ZipFile.OpenRead(Path.Combine(downloadDir, "temp.zip")))
+                {
+                    MyZipFileExtensions.ExtractToDirectory(zipArchive, extractDir, true);
+                }
+            }
+            catch (Exception ex)
+            {
+                // 例外が発生した場合、エラーメッセージを表示して処理を終了する
+                textBox1.Text = "Error: " + ex.ToString();
+                return;
+            }
+            finally
+            {
+                // Zipファイルを削除
+                try
+                {
+                    File.Delete(Path.Combine(downloadDir, "temp.zip"));
+                }
+                catch (IOException)
+                {
+                    textBox1.Text = "展開中……";
+                    Thread.Sleep(1000);
+                }
+            }
+
+            // ダウンロード完了後、ゲーム起動
+            string exepath = Path.Combine(currentdir, label2.Text, label3.Text);
+            if (File.Exists(exepath))
+            {
+                GameStart(downloadDir, exepath);
+            }
+            else
+            {
+                textBox1.Text = exepath + "のファイルが見つかりません。";
+            }
+        }
+
+
+    }   
+
+
 
     ///https://notshown.hatenablog.jp/entry/2017/02/15/090908　より
     /// <summary>
