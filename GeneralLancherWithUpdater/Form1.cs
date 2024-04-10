@@ -195,6 +195,7 @@ namespace GeneralLancherWithUpdater
                     else
                     {
                         textBox1.Text = "新バージョンが見つかりました。アップデート中……";
+                        button1.Enabled = false;    //これ以上ボタンを押せないようにする
 
                         // ダウンロードするZipファイルのURL
                         string zipUrl = label9.Text;
@@ -209,7 +210,7 @@ namespace GeneralLancherWithUpdater
                         }
                         catch (Exception ex)
                         {
-                            textBox1.Text = "ダウンロードURLが無効です。";
+                            textBox1.Text = "ダウンロードURLが無効です。iniファイルを確認して再起動してください。";
                             return;
                         }
                     }
